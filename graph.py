@@ -111,6 +111,7 @@ def dijkstra(graph, start, end):
 
 def formatprint(l):
     restr = ''
-    for i in l:
-        restr += i + ' -> '
-    return restr[:-4]
+    totalt = sum([graph.get(i).get(l[l.index(i) + 1]) for i in l[:-1]])
+    for i in l[:-1]:
+        restr += i + ' - ' + str(graph.get(i).get(l[l.index(i) + 1])) + ' - '
+    return restr + l[-1], totalt
