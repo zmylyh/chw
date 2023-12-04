@@ -603,6 +603,19 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>start_line</tabstop>
+  <tabstop>start_station</tabstop>
+  <tabstop>add_button</tabstop>
+  <tabstop>delete_button</tabstop>
+  <tabstop>stopover_list</tabstop>
+  <tabstop>end_line</tabstop>
+  <tabstop>end_station</tabstop>
+  <tabstop>preference</tabstop>
+  <tabstop>calculate</tabstop>
+  <tabstop>textBrowser</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
