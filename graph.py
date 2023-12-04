@@ -10,14 +10,14 @@ graph = {
     '黄沙站': {'芳村站': 4, '长寿路站': 5},
     '长寿路站': {'黄沙站': 5, '陈家祠站': 5},
     '陈家祠站': {'长寿路站': 5, '西门口站': 4},
-    '西门口站': {'陈家祠站': 4, '公园前站': 2},
+    '西门口站': {'陈家祠站': 4, '公园前站1': 2},
     '公园前站1': {'西门口站': 2, '农讲所站': 3, '公园前站2': 10},
-    '农讲所站': {'公园前站': 3, '烈士陵园站': 3},
+    '农讲所站': {'公园前站1': 3, '烈士陵园站': 3},
     '烈士陵园站': {'农讲所站': 3, '东山口站': 5},
     '东山口站': {'烈士陵园站': 5, '杨箕站': 5},
-    '杨箕站': {'东山口站': 5, '体育西路站': 3},
+    '杨箕站': {'东山口站': 5, '体育西路站1': 3},
     '体育西路站1': {'杨箕站': 3, '体育中心站': 5, '体育西路站3': 10},
-    '体育中心站': {'体育西路站': 5, '广州东站': 5},
+    '体育中心站': {'体育西路站1': 5, '广州东站': 5},
     '广州南站': {'石壁站': 4},
     '石壁站': {'广州南站': 4, '会江站': 3},
     '会江站': {'石壁站': 3, '南浦站': 5},
@@ -29,9 +29,9 @@ graph = {
     '昌岗站': {'江泰路站': 3, '江南西站': 3},
     '江南西站': {'昌岗站': 3, '市二宫站': 4},
     '市二宫站': {'江南西站': 4, '海珠广场站': 4},
-    '海珠广场站': {'市二宫站': 4, '公园前站': 1},
+    '海珠广场站': {'市二宫站': 4, '公园前站2': 1},
     '公园前站2': {'海珠广场站': 1, '纪念堂站': 1, '公园前站1': 10},
-    '纪念堂站': {'公园前站': 1, '越秀公园站': 1},
+    '纪念堂站': {'公园前站2': 1, '越秀公园站': 1},
     '越秀公园站': {'纪念堂站': 1, '广州火车站': 3},
     '广州火车站': {'越秀公园站': 3, '三元里站': 3},
     '三元里站': {'广州火车站': 3, '飞翔公园站': 3},
@@ -75,18 +75,41 @@ graph = {
 }
 
 
-# '珠江新城站', '体育西路站', '石牌桥站', '岗顶站',
-# '华师站', '五山站', '天河客运站', '林和西站',
-# '广州东站', '燕塘站', '梅花园站',
-# '广州塔站', '客村站', '大塘站',
-# '沥滘站', '梅花园站', '京溪南方医院站',
-# '同和站', '永泰站', '白云大道北站',
-# '嘉禾望岗站', '龙归站', '人和站',
-# '高增站', '厦滘站', '大石站',
-# '汉溪长隆站', '市桥站', '番禺广场站',
-# '机场南站', '机场北站'
+
 def randomint():
     return random.randint(1, 5)
 
 
-print(randomint())
+def dijkstra(graph, start, end):
+    shortest_paths = {start: (None, 0)}
+    current_node = start
+    visited = set()
+
+    while current_node != end:
+        visited.add(current_node)
+        destinations = graph[current_node]
+        weight_to_current_node = shortest_paths[current_node][1]
+
+        for next_node, weight in destinations.items():
+            weight = weight + weight_to_current_node
+            if next_node not in shortest_paths:
+                shortest_paths[next_node] = (current_node, weight)
+            else:
+                current_shortest_weight = shortest_paths[next_node][1]
+                if current_shortest_weight > weight:
+                    shortest_paths[next_node] = (current_node, weight)
+
+        next_destinations = {node: shortest_paths[node] for node in shortest_paths if node not in visited}
+        if not next_destinations:
+            return "Route Not Possible"
+        current_node = min(next_destinations, key=lambda k: next_destinations[k][1])
+
+    path = []
+    while current_node is not None:
+        path.append(current_node)
+        next_node = shortest_paths[current_node][0]
+        current_node = next_node
+    path = path[::-1]
+    return path
+
+print(dijkstra(graph, '西塱站', '体育西路站3'))
