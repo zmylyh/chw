@@ -168,11 +168,23 @@ def show_result():
     UI.result.setText(show_str)
 
 
+def clear_inputs():
+    UI.start_line.setCurrentIndex(0)
+    UI.start_station.clear()
+    UI.end_line.setCurrentIndex(0)
+    UI.end_station.clear()
+    UI.stopover_list.clear()
+    UI.stopover_list.setRowCount(0)
+    UI.stopover_list.setColumnCount(0)
+    UI.preference.setCurrentIndex(0)
+
+
 def calculate_route_slot():
     remove_blank()
     get_stop_list()
     calculate_all()
     show_result()
+    clear_inputs()
     UI.stack.setCurrentIndex(1)
 
 
