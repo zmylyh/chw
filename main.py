@@ -188,6 +188,16 @@ def calculate_route_slot():
     UI.stack.setCurrentIndex(1)
 
 
+def show_map():
+    img = QtGui.QPixmap()
+    img.load(f'line{UI.map_line.currentText()}.png')
+    img_item = QtWidgets.QGraphicsPixmapItem()
+    img_item.setPixmap(QtGui.QPixmap(img))
+    UI.map_view.fitInView(QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap(img)))
+
+
+
+
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     Main = QtWidgets.QMainWindow()
@@ -196,8 +206,13 @@ if __name__ == '__main__':
 
     add_item_cb(UI.start_line, ['', '1', '2', '3'])
     add_item_cb(UI.end_line, ['', '1', '2', '3'])
+    add_item_cb(UI.map_line, ['', '1', '2', '3'])
     add_item_cb(UI.preference, ['shortest time', 'minimize transfers'])
     UI.preference.setCurrentIndex(0)
+
+    # graphicView setup
+    scene = QtWidgets.QGraphicsScene()
+    UI.map_view.setScene(scene)
 
     UI.start_line.currentIndexChanged.connect(show_start_list)
     UI.end_line.currentIndexChanged.connect(show_end_list)
@@ -206,7 +221,9 @@ if __name__ == '__main__':
     UI.calculate.clicked.connect(calculate_route_slot)
     UI.return_home.clicked.connect(lambda turn: UI.stack.setCurrentIndex(0))
     UI.return_home_2.clicked.connect(lambda turn: UI.stack.setCurrentIndex(0))
+    UI.map_line.currentIndexChanged.connect(show_map)
 
     UI.stack.setCurrentIndex(0)
     Main.show()
+    UI.map_view.show()
     sys.exit(app.exec())
