@@ -2,8 +2,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 import GUI
-import algorithm
-import algorithm as G
+import algorithm as algo
 import source
 
 stop_list = []  # list of stops: [[line, station], ...]
@@ -100,16 +99,6 @@ def remove_blank():
         table.setColumnCount(0)
 
 
-def calculate(start: str, end: str):
-    global result_route
-    prf = UI.preference.currentIndex()
-    if prf == 0:
-        d_result = G.dijkstra(G.graph, start, end)
-    else:
-        d_result = G.dijkstra(G.graph2, start, end)
-    return d_result
-
-
 def is_transfer(station: str):
     return station in source.transfer_list
 
@@ -148,11 +137,11 @@ def calculate_all():
                 start += stop_list[i][0]
             if is_transfer(end):
                 end += stop_list[i + 1][0]
-            result = algorithm.dijkstra(G.graph2, start, end)
+            result = algo.dijkstra(source.graph2, start, end)
 
         else:
             # the preference is 'shortest time'
-            result = algorithm.dijkstra(G.graph, start, end)
+            result = algo.dijkstra(source.graph, start, end)
 
         if type(result) == str:
             # no possible route
@@ -213,7 +202,7 @@ def show_map():
         scene.clear()
         return
     # load the map picture
-    img.load(f'line{UI.map_line.currentText()}.png')
+    img.load(f'img/line{UI.map_line.currentText()}.png')
     img_item = QtWidgets.QGraphicsPixmapItem()
     img_item.setPixmap(QtGui.QPixmap(img))
     scene.clear()
