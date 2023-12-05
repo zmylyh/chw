@@ -2,8 +2,8 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 import GUI
-import graph
-import graph as G
+import algorithm
+import algorithm as G
 import source
 
 stop_list = []  # list of stops: [[line, station], ...]
@@ -148,11 +148,11 @@ def calculate_all():
                 start += stop_list[i][0]
             if is_transfer(end):
                 end += stop_list[i + 1][0]
-            result = graph.dijkstra(G.graph2, start, end)
+            result = algorithm.dijkstra(G.graph2, start, end)
 
         else:
             # the preference is 'shortest time'
-            result = graph.dijkstra(G.graph, start, end)
+            result = algorithm.dijkstra(G.graph, start, end)
 
         if type(result) == str:
             # no possible route
