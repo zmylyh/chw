@@ -149,7 +149,7 @@ def calculate_all():
             print(result)
         if type(result) == str:
             result_list.clear()
-            return result
+            result_list.append(result)
         else:
             result_list.append(result[0])
             total_time += result[1]
@@ -161,10 +161,13 @@ def show_result():
     global total_time
     show_str = ''
     UI.result.setText('')
-    for i in range(len(result_list)):
-        show_str += f'{stop_list[i][1]} to {stop_list[i + 1][1]}:\n'
-        show_str += f'{result_list[i]}\n\n'
-    show_str += f'Total time: {total_time}'
+    if "Route Not Possible" in result_list:
+        show_str = result_list[0]
+    else:
+        for i in range(len(result_list)):
+            show_str += f'{stop_list[i][1]} to {stop_list[i + 1][1]}:\n'
+            show_str += f'{result_list[i]}\n\n'
+        show_str += f'Total time: {total_time}'
     UI.result.setText(show_str)
 
 
@@ -180,20 +183,33 @@ def clear_inputs():
 
 
 def calculate_route_slot():
+    if UI.start_line.currentIndex() == 0 or UI.end_line.currentIndex() == 0:
+        return
     remove_blank()
     get_stop_list()
     calculate_all()
     show_result()
-    clear_inputs()
+    # clear_inputs()
     UI.stack.setCurrentIndex(1)
+
+
+def setup_map():
+    UI.map_line.setCurrentIndex(0)
+    scene.clear()
+    UI.stack.setCurrentIndex(2)
 
 
 def show_map():
     img = QtGui.QPixmap()
+    if UI.map_line.currentText() == '':
+        scene.clear()
+        return
     img.load(f'line{UI.map_line.currentText()}.png')
     img_item = QtWidgets.QGraphicsPixmapItem()
     img_item.setPixmap(QtGui.QPixmap(img))
-    UI.map_view.fitInView(QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap(img)))
+    scene.clear()
+    scene.addItem(img_item)
+    # UI.map_view.fitInView(QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap(img)))
 
 
 
@@ -206,7 +222,7 @@ if __name__ == '__main__':
 
     add_item_cb(UI.start_line, ['', '1', '2', '3'])
     add_item_cb(UI.end_line, ['', '1', '2', '3'])
-    add_item_cb(UI.map_line, ['', '1', '2', '3'])
+    add_item_cb(UI.map_line, ['', '总线', '1', '2', '3', '3(北延段)'])
     add_item_cb(UI.preference, ['shortest time', 'minimize transfers'])
     UI.preference.setCurrentIndex(0)
 
@@ -222,6 +238,7 @@ if __name__ == '__main__':
     UI.return_home.clicked.connect(lambda turn: UI.stack.setCurrentIndex(0))
     UI.return_home_2.clicked.connect(lambda turn: UI.stack.setCurrentIndex(0))
     UI.map_line.currentIndexChanged.connect(show_map)
+    UI.show_map.clicked.connect(setup_map)
 
     UI.stack.setCurrentIndex(0)
     Main.show()
