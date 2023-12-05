@@ -103,7 +103,7 @@ def calculate(start: str, end: str):
 
 
 def is_transfer(station: str):
-    return station in source.l1Tl2 + source.l1Tl3 + source.l2Tl3
+    return station in source.transfer_list
 
 
 def get_stop_list():
@@ -140,8 +140,10 @@ def calculate_all():
         if prf == 1:
             if is_transfer(start):
                 start += stop_list[i][0]
+                print(start)
             if is_transfer(end):
-                end += stop_list[i][0]
+                end += stop_list[i + 1][0]
+                print(end)
             result = graph.dijkstra(G.graph2, start, end)
             print(result)
         else:
