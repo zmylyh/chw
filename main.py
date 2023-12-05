@@ -7,7 +7,7 @@ import graph as G
 import source
 
 stop_list = []  # list of stops: [[line, station], ...]
-result_list = []  # [str, str, ...]
+result_list = []  # list of the result [str, str, ...]
 result_route = ''
 total_time = 0
 
@@ -60,6 +60,7 @@ def add_multi_row(header_list: list | tuple, table):
 
 
 def add_stopover():
+    # create two temp widgets
     cb_line = QtWidgets.QComboBox()
     add_item_cb(cb_line, ['', '1', '2', '3'])
     cb_station = QtWidgets.QComboBox()
@@ -67,14 +68,17 @@ def add_stopover():
     def add_tmp():
         add_by_line(cb_station, cb_line.currentText())
 
+    # create connection between the column 1 and column 2
     cb_line.currentIndexChanged.connect(add_tmp)
-
     table = UI.stopover_list
     if table.columnCount() == 0:
+        # only add column headers when the table is empty
         add_multi_column(['line', 'station'], table)
     add_multi_row([str(table.rowCount() + 1)], table)
+    # add into the table
     table.setCellWidget(table.rowCount() - 1, 0, cb_line)
     table.setCellWidget(table.rowCount() - 1, 1, cb_station)
+    # set the cell width to increase readability
     UI.stopover_list.setColumnWidth(1, 200)
 
 
@@ -86,10 +90,14 @@ def del_stopover():
 
 
 def remove_blank():
+    # remove blank lines if the user leave some
     table = UI.stopover_list
     for i in range(table.rowCount() - 1, -1, -1):
         if table.cellWidget(i, 0).currentIndex() == 0:
             table.removeRow(i)
+    # remove the header if there is no stopover left
+    if table.rowCount() == 0:
+        table.setColumnCount(0)
 
 
 def calculate(start: str, end: str):
@@ -113,6 +121,7 @@ def get_stop_list():
     stop_list.append(stop.copy())
     table = UI.stopover_list
     if table.rowCount() > 0:
+        # get the stopovers in the table
         for r in range(table.rowCount()):
             stop.clear()
             stop.append(table.cellWidget(r, 0).currentText())
@@ -121,7 +130,6 @@ def get_stop_list():
     stop.clear()
     stop = [UI.end_line.currentText(), UI.end_station.currentText()]
     stop_list.append(stop)
-    print(stop_list)
 
 
 def calculate_all():
@@ -131,31 +139,28 @@ def calculate_all():
     result_list.clear()
     total_time = 0
     prf = UI.preference.currentIndex()
-    print(stop_list)
     for i in range(len(stop_list) - 1):
         start = stop_list[i][1]
         end = stop_list[i + 1][1]
-        print(start)
-        print(end)
         if prf == 1:
+            # when the preference is 'minimize transfer', check if the station is in the transfer_list
             if is_transfer(start):
                 start += stop_list[i][0]
-                print(start)
             if is_transfer(end):
                 end += stop_list[i + 1][0]
-                print(end)
             result = graph.dijkstra(G.graph2, start, end)
-            print(result)
+
         else:
+            # the preference is 'shortest time'
             result = graph.dijkstra(G.graph, start, end)
-            print(result)
+
         if type(result) == str:
+            # no possible route
             result_list.clear()
             result_list.append(result)
         else:
             result_list.append(result[0])
             total_time += result[1]
-    print(result_list)
     return result_list
 
 
@@ -204,24 +209,26 @@ def setup_map():
 def show_map():
     img = QtGui.QPixmap()
     if UI.map_line.currentText() == '':
+        # if the user select nothing, clear the viewer
         scene.clear()
         return
+    # load the map picture
     img.load(f'line{UI.map_line.currentText()}.png')
     img_item = QtWidgets.QGraphicsPixmapItem()
     img_item.setPixmap(QtGui.QPixmap(img))
     scene.clear()
     scene.addItem(img_item)
-    # UI.map_view.fitInView(QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap(img)))
-
-
 
 
 if __name__ == '__main__':
+    # program setup
     app = QtWidgets.QApplication(sys.argv)
     Main = QtWidgets.QMainWindow()
     UI = GUI.Ui_MainWindow()
     UI.setupUi(Main)
+    Main.setWindowTitle('SRP System')
 
+    # initialise widgets
     add_item_cb(UI.start_line, ['', '1', '2', '3'])
     add_item_cb(UI.end_line, ['', '1', '2', '3'])
     add_item_cb(UI.map_line, ['', '总线', '1', '2', '3', '3(北延段)'])
@@ -232,6 +239,7 @@ if __name__ == '__main__':
     scene = QtWidgets.QGraphicsScene()
     UI.map_view.setScene(scene)
 
+    # connections
     UI.start_line.currentIndexChanged.connect(show_start_list)
     UI.end_line.currentIndexChanged.connect(show_end_list)
     UI.add_button.clicked.connect(add_stopover)
@@ -245,4 +253,6 @@ if __name__ == '__main__':
     UI.stack.setCurrentIndex(0)
     Main.show()
     UI.map_view.show()
+
+    # close condition
     sys.exit(app.exec())
